@@ -32,7 +32,7 @@ class polyvore_dataset:
         data = tf.data.Dataset.from_tensor_slices(fileList)
         data = data.map(self.process, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
-        data = data.cache()  #
+        #data = data.cache()  #
 
         data = data.batch(batchSize)
         data = data.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
