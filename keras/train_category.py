@@ -23,7 +23,7 @@ if __name__=='__main__':
         x = base_model.output
         x = GlobalAveragePooling2D()(x)
         x = Dense(512, activation='relu')(x)
-        predictions = Dense(nClass, activation = 'softmax')(x)
+        predictions = Dense(nClass, activation = 'softmax', kernel_regularizer=tfk.regularizers.l2())(x)
         model = Model(inputs=base_model.input, outputs=predictions)
         for layer in base_model.layers:
             layer.trainable = False
@@ -34,9 +34,31 @@ if __name__=='__main__':
     model.summary()
 
     # training - num worker is obsolete now
-    model.fit(trainData, validation_data=valData, epochs=Config['num_epochs'])
+    model.fit(trainData, validation_data=valData, epochs=Config['num_epochs'],
+              steps_per_epoch=100, validation_steps=10, callbacks=[tfk.callbacks.EarlyStopping(patience=1)])
 
 
+'''
+
+    # build model
+#strategy = tf.distribute.MirroredStrategy()
+#with strategy.scope():
+base_model = ResNet50(weights='imagenet', include_top=False)
+x = base_model.output
+x = GlobalAveragePooling2D()(x)
+x = Dense(512, activation='relu', kernel_regularizer=tfk.regularizers.l2())(x)
+predictions = Dense(nClass, activation = 'softmax', )(x)
+model = Model(inputs=base_model.input, outputs=predictions)
+
+optimizer = tfk.optimizers.RMSprop(Config['learning_rate'])
+    # define optimizers
+model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.summary()
+
+    # training - num worker is obsolete now
+model.fit(trainData, validation_data=valData, epochs=Config['num_epochs'],
+              steps_per_epoch=1000, validation_steps = 100)
+'''
 
 
 

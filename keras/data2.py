@@ -34,7 +34,7 @@ class polyvore_dataset:
 
         #data = data.cache()  #
 
-        data = data.batch(batchSize)
+        data = data.batch(batchSize).repeat()
         data = data.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
         return data
 
@@ -54,7 +54,7 @@ class polyvore_dataset:
         nameAndId = [os.path.join(self.image_dir, name + '.jpg' + ';' + translate(label['category_id'])) for name, label in
                      meta.items()]
         random.shuffle(nameAndId)
-        idx = 1 - int(len(nameAndId) * 0.2) # 80/20 split
+        idx = int(len(nameAndId) * 0.8) # 80/20 split
         return nameAndId[:idx], nameAndId[idx:], dictionary['max']+1
 
 
